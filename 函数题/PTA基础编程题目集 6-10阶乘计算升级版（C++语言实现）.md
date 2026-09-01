@@ -43,6 +43,39 @@ int main()
 1307674368000
 ```
 
+## 函数部分
+
+使用低位在前的数组模拟大整数乘法。每次把当前阶乘的每一位乘以新因子，再把进位继续传给更高位。
+
+```cpp
+void Print_Factorial(const int N)
+{
+    if (N < 0) {
+        printf("Invalid input");
+        return;
+    }
+
+    int digits[3000] = {1};
+    int length = 1;
+    for (int factor = 2; factor <= N; ++factor) {
+        int carry = 0;
+        for (int i = 0; i < length; ++i) {
+            int product = digits[i] * factor + carry;
+            digits[i] = product % 10;
+            carry = product / 10;
+        }
+        while (carry > 0) {
+            digits[length++] = carry % 10;
+            carry /= 10;
+        }
+    }
+
+    for (int i = length - 1; i >= 0; --i) {
+        printf("%d", digits[i]);
+    }
+}
+```
+
 ## 解题思路
 
 这道题的核心是**大数乘法模拟**：N 最大为 1000，1000! 远超 int 范围，必须用数组逐位存储结果并模拟乘法进位，最后倒序输出每一位。
@@ -169,3 +202,17 @@ flowchart TD
   D --> J["结束"]
   I --> J
 ```
+
+## 复杂度分析
+
+设最终结果 N! 有 `D` 位：
+
+- 时间复杂度：`O(∑ᵢ₌₂ᴺ digits((i - 1)!))`，即每个因子都要遍历当前大整数的所有位；可粗略记为 `O(ND)`。
+- 空间复杂度：`O(D)`，数组按位保存阶乘结果；本题中由固定数组容量限制。
+
+## 常见易错点
+
+1. `N < 0` 时应输出 `Invalid input`，不能进行阶乘计算。
+2. 大整数数组通常低位在前，输出时必须从最高位倒序输出。
+3. 每一位乘法都要同时处理进位，并在最高位仍有进位时扩展位数。
+4. 初始结果应为 1，这样 `0!` 和 `1!` 都能正确输出。
